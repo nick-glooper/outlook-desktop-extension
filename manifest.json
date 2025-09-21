@@ -1,0 +1,60 @@
+{
+  "manifest_version": "0.1",
+  "name": "outlook-desktop-extension",
+  "version": "1.0.0",
+  "description": "Claude Desktop Extension for Microsoft Outlook integration with full read/write access to emails, calendar, and contacts",
+  "display_name": "Outlook Desktop Extension",
+  "author": {
+    "name": "Nick Sutherland",
+    "email": "nick.sutherland@glooper.ai"
+  },
+  "license": "MIT",
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["server/index.js"]
+    }
+  },
+  "tools": [
+    {
+      "name": "send_email",
+      "description": "Send an email through Outlook"
+    },
+    {
+      "name": "read_emails",
+      "description": "Read and search emails from Outlook"
+    },
+    {
+      "name": "create_calendar_event",
+      "description": "Create a new calendar event in Outlook"
+    },
+    {
+      "name": "get_calendar_events",
+      "description": "Retrieve calendar events from Outlook"
+    },
+    {
+      "name": "search_contacts",
+      "description": "Search for contacts in Outlook"
+    },
+    {
+      "name": "create_contact",
+      "description": "Create a new contact in Outlook"
+    }
+  ],
+  "user_config": {
+    "client_id": {
+      "title": "Microsoft App Client ID",
+      "description": "Azure App Registration Client ID for Microsoft Graph API access",
+      "type": "string",
+      "required": true
+    },
+    "tenant_id": {
+      "title": "Microsoft Tenant ID",
+      "description": "Azure Active Directory Tenant ID",
+      "type": "string",
+      "required": true
+    }
+  }
+}
