@@ -27,11 +27,60 @@ class OutlookMCPServer {
 
   async initializeAuth() {
     if (!this.authProvider) {
-      const clientId = process.env.CLIENT_ID;
-      const tenantId = process.env.TENANT_ID;
+      // First try command line arguments (similar to Softeria implementation)
+      const args = process.argv;
+      let clientId = null;
+      let tenantId = null;
 
-      if (!clientId || !tenantId) {
-        throw new Error('CLIENT_ID and TENANT_ID environment variables are required');
+      for (let i = 0; i < args.length; i++) {
+        if (args[i] === '--client-id' && i + 1 < args.length) {
+          clientId = args[i + 1];
+        }
+        if (args[i] === '--tenant-id' && i + 1 < args.length) {
+          tenantId = args[i + 1];
+        }
+      }
+
+      // Then try environment variables (various formats Claude Desktop might use)
+      if (!clientId) {
+        clientId = process.env.CLIENT_ID ||
+                  process.env.client_id ||
+                  process.env.MCP_CLIENT_ID ||
+                  process.env.USER_CONFIG_CLIENT_ID ||
+                  process.env.MS365_MCP_CLIENT_ID;
+      }
+
+      if (!tenantId) {
+        tenantId = process.env.TENANT_ID ||
+                  process.env.tenant_id ||
+                  process.env.MCP_TENANT_ID ||
+                  process.env.USER_CONFIG_TENANT_ID ||
+                  process.env.MS365_MCP_TENANT_ID;
+      }
+
+      // Fallback to default values for testing
+      if (!clientId) {
+        clientId = 'your-client-id-here';
+      }
+      if (!tenantId) {
+        tenantId = 'your-tenant-id-here';
+      }
+
+      console.error('=== Outlook Extension Debug Info ===');
+      console.error('CLIENT_ID:', clientId ? (clientId.length > 10 ? clientId.substring(0, 10) + '...' : clientId) : 'Missing');
+      console.error('TENANT_ID:', tenantId ? (tenantId.length > 10 ? tenantId.substring(0, 10) + '...' : tenantId) : 'Missing');
+      console.error('Command line args:', args.slice(2));
+      console.error('Env vars with CLIENT/TENANT:', Object.keys(process.env).filter(k => k.toUpperCase().includes('CLIENT') || k.toUpperCase().includes('TENANT')));
+
+      if (!clientId || clientId === 'your-client-id-here' || !tenantId || tenantId === 'your-tenant-id-here') {
+        throw new Error(`
+=== CONFIGURATION REQUIRED ===
+Please configure your Azure App Registration details:
+1. CLIENT_ID: ${clientId === 'your-client-id-here' ? 'NOT SET' : 'Set'}
+2. TENANT_ID: ${tenantId === 'your-tenant-id-here' ? 'NOT SET' : 'Set'}
+
+Add these to Claude Desktop extension configuration or set as environment variables.
+        `);
       }
 
       this.authProvider = new GraphAuthProvider(clientId, tenantId);

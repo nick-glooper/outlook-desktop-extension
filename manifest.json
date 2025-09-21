@@ -14,7 +14,13 @@
     "entry_point": "server/index.js",
     "mcp_config": {
       "command": "node",
-      "args": ["server/index.js"]
+      "args": [
+        "server/index.js",
+        "--client-id",
+        "${user_config.client_id}",
+        "--tenant-id",
+        "${user_config.tenant_id}"
+      ]
     }
   },
   "tools": [
